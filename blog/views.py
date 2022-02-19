@@ -1,10 +1,12 @@
+from dataclasses import field
 import re
 from venv import create
 from django.shortcuts import get_object_or_404 ,render, redirect
-from django.views.generic import View
+from django.views.generic import View, UpdateView, DeleteView
 
 from .forms import PostCreateForm
 from .models import Post
+from django.urls import reverse_lazy
 
 # Create your views here.
 class BlogListView(View):
@@ -46,3 +48,17 @@ class BlogDetailView(View):
             'post':post
         }
         return render(requests, 'blog_detail.html', context)
+
+class BlogUpdateView(UpdateView):
+    model=Post
+    fields=['title', 'content']
+    template_name='blog_update.html'
+
+    def get_success_url(self):
+        pk = self.kwargs['pk']
+        return reverse_lazy('blog:detail', kwargs={'pk':pk})
+
+class BlogDeleteView(DeleteView):
+    model=Post
+    template_name='blog_delete.html'
+    success_url= reverse_lazy('blog:home')
